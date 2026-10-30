@@ -66,6 +66,13 @@ dap.listeners.after.event_output['test'] = function(_, body)
   end
 end
 
+local notified = {}
+local notify = vim.notify
+vim.notify = function(msg, ...)
+  table.insert(notified, msg)
+  return notify(msg, ...)
+end
+
 vim.cmd('Ant debug')
 assert(vim.wait(10000, function()
   return stopped ~= nil
@@ -86,4 +93,11 @@ assert(vim.wait(10000, function()
 end, 20), 'the program did not exit')
 h.eq(0, exited.exitCode, 'exit code')
 h.eq('1\n2\n', table.concat(output), 'program output')
+
+-- nvim-dap closes the connection after terminated without disconnect, and ant dap ends with 0
+-- for that (spec/dap.md section 1), so nvim-dap says nothing of the adapter's exit.
+vim.wait(1000)
+for _, msg in ipairs(notified) do
+  assert(not tostring(msg):find('exited with', 1, true), msg)
+end
 _ = buf
