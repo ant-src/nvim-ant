@@ -85,7 +85,7 @@ local xml = h.buffer({ '<project name="x"></project>' }, 'build.xml')
 h.eq('ant', vim.bo[xml].filetype, 'build.xml filetype')
 vim.wait(300)
 h.eq(nil, client(xml), 'no client for build.xml')
-h.eq(nil, vim.fn.execute('syntax list'):find('antTemplate%s+xxx start='), 'build.xml has no Ant syntax')
+h.eq(nil, vim.fn.execute('syntax list'):find('antRawString%s+xxx start='), 'build.xml has no Ant syntax')
 h.eq(nil, vim.bo[xml].indentexpr:match('ant%.indent'), 'build.xml keeps its indent')
 
 -- :Ant restart starts a new server for the open buffers.

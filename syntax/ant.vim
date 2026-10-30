@@ -62,11 +62,12 @@ syn match antFloat '\<\d\%(_\?\d\)*e[-+]\?\d\%(_\?\d\)*\>'
 syn match antOperator '[-+*/%=!<>&|?]'
 syn match antOperator '\.\.\.'
 
-" Strings: a plain string stays on one line; a template string spans lines and interpolates.
-syn match antEscape '\\\%([ntr\\"`$]\|u{\x\+}\)' contained
-syn match antEscapeError '\\[^ntr\\"`$u]' contained
-syn region antString start='"' skip='\\\\\|\\"' end='"' end='$' oneline contains=antEscape,antEscapeError
-syn region antTemplate start='`' skip='\\\\\|\\`' end='`' contains=antEscape,antEscapeError,antInterpolation
+" Strings (section 2): "..." has escapes and ${...} interpolation, a `...` raw string has neither,
+" and both may span lines.
+syn match antEscape '\\\%([ntr\\"$]\|u{\x\+}\)' contained
+syn match antEscapeError '\\[^ntr\\"$u]' contained
+syn region antString start='"' skip='\\\\\|\\"' end='"' contains=antEscape,antEscapeError,antInterpolation
+syn region antRawString start='`' end='`'
 syn region antInterpolation matchgroup=antDelimiter start='\${' end='}' contained contains=TOP
 
 " Braces nest, so that the } of a lambda or record inside ${...} or {...} does not end it.
@@ -121,7 +122,7 @@ hi def link antNumber Number
 hi def link antFloat Float
 hi def link antOperator Operator
 hi def link antString String
-hi def link antTemplate String
+hi def link antRawString String
 hi def link antEscape SpecialChar
 hi def link antEscapeError Error
 hi def link antDelimiter Delimiter

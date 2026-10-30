@@ -6,7 +6,6 @@ local M = {}
 -- Syntax groups whose text holds no code: brackets and operators in them mean nothing.
 local function is_text(name)
   return name:find('String', 1, true)
-    or name:find('Template', 1, true)
     or name:find('Regex', 1, true)
     or name:find('Comment', 1, true)
     or name:find('Escape', 1, true)
@@ -104,24 +103,30 @@ local function info(lnum)
   return hit
 end
 
--- inside_text tells whether a line starts inside a template string or a block comment that began
--- on a line above.
-local function inside_text(lnum)
-  if vim.b.current_syntax ~= 'ant' then
-    return false
-  end
-  local line = vim.fn.getline(lnum)
-  if line:match('^%s*/[/*]') or line:match('^%s*`') then
-    return false
-  end
-  local first = vim.fn.match(line, '\\S') + 1
-  for _, id in ipairs(vim.fn.synstack(lnum, math.max(first, 1))) do
-    local name = vim.fn.synIDattr(id, 'name')
-    if name == 'antTemplate' or name == 'antComment' then
+-- in_kept tells whether the position is in a string, a raw string, or a block comment, whose lines
+-- are kept as written, the code of a string's interpolations included (fmt.md 4.9).
+local kept = { antString = true, antRawString = true, antComment = true }
+local function in_kept(lnum, col)
+  for _, id in ipairs(vim.fn.synstack(lnum, col)) do
+    if kept[vim.fn.synIDattr(id, 'name')] then
       return true
     end
   end
   return false
+end
+
+-- inside_text tells whether a line starts inside a string, a raw string, or a block comment that
+-- began on a line above: the line above ends inside it too.
+local function inside_text(lnum)
+  if vim.b.current_syntax ~= 'ant' or lnum <= 1 then
+    return false
+  end
+  local line = vim.fn.getline(lnum)
+  if line:match('^%s*/[/*]') then
+    return false
+  end
+  local first = vim.fn.match(line, '\\S') + 1
+  return in_kept(lnum, math.max(first, 1)) and in_kept(lnum - 1, #vim.fn.getline(lnum - 1) + 1)
 end
 
 local function prev(lnum)
@@ -201,7 +206,7 @@ function M.get(lnum)
   if p == 0 then
     return 0
   end
-  -- the lines of a template string and of a block comment are kept as written (fmt.md 4.9)
+  -- the lines of a string, of a raw string, and of a block comment are kept as written (fmt.md 4.9)
   if inside_text(lnum) then
     return -1
   end

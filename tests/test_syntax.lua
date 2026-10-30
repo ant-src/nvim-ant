@@ -9,7 +9,7 @@ h.buffer({
   'var r = /^\\d{4}[/]x$/i',
   'var q = total / count',
   'var s = "a\\nb\\q"',
-  'var t = `n: ${ { x: 1 }.x } \\` end`',
+  'var t = "n: ${ { x: 1 }.x } \\" ${"in}"} \\${x} end"',
   'var e = event.type',
   'var h = <div class="a" id={id}>if x &amp; <br /> {name}</div>',
   'var f = <>for <b>y</b></>',
@@ -18,6 +18,10 @@ h.buffer({
   '/* block',
   '   comment */ var after = true',
   'var st = <style>a { color: red } if</style>',
+  'var raw = `C:\\temp ${x} "q"`',
+  'var ml = "one',
+  'two ${n} three"',
+  'var after2 = 1',
 })
 vim.bo.filetype = 'ant'
 
@@ -40,8 +44,12 @@ h.eq('antOperator', h.group(7, '/ count'), 'division')
 h.eq('antEscape', h.group(8, '\\n'), 'escape')
 h.eq('antEscapeError', h.group(8, '\\q'), 'bad escape')
 h.eq('antDelimiter', h.group(9, '${'), 'interpolation start')
-h.eq('antTemplate', h.group(9, '} \\`', 1), 'template after nested braces')
-h.eq('antEscape', h.group(9, '\\`'), 'escaped backtick')
+h.eq('antString', h.group(9, '} \\"', 1), 'string after nested braces')
+h.eq('antEscape', h.group(9, '\\"'), 'escaped quote')
+h.eq('antString', h.group(9, 'in}'), 'string inside an interpolation')
+h.eq('antString', h.group(9, '"} ', 2), 'string after an interpolation holding a string')
+h.eq('antEscape', h.group(9, '\\${'), 'escaped dollar')
+h.eq('antString', h.group(9, '{x}'), 'no interpolation after \\$')
 h.eq('', h.group(10, 'type'), 'keyword after .')
 h.eq('antTag', h.group(11, '<div'), 'tag')
 h.eq('antAttribute', h.group(11, 'class'), 'attribute')
@@ -66,10 +74,17 @@ h.eq('antComment', h.group(16, 'comment'), 'block comment')
 h.eq('antStorage', h.group(16, 'var'), 'code after a block comment')
 h.eq('antRaw', h.group(17, 'color'), 'style content')
 h.eq('antRaw', h.group(17, 'if'), 'style content keyword')
+h.eq('antRawString', h.group(18, '\\temp'), 'no escape in a raw string')
+h.eq('antRawString', h.group(18, '${x}'), 'no interpolation in a raw string')
+h.eq('antRawString', h.group(18, '"q"'), 'quote in a raw string')
+h.eq('antStorage', h.group(18, 'var'), 'code before a raw string')
+h.eq('antString', h.group(20, 'two'), 'multi-line string')
+h.eq('antDelimiter', h.group(20, '${'), 'interpolation on a later line')
+h.eq('antStorage', h.group(21, 'var'), 'code after a multi-line string')
 
 -- Every file of the corpus ends outside any string, comment, regex, or markup, so no region runs away.
 local open = {
-  antString = true, antTemplate = true, antRegex = true, antComment = true, antElement = true,
+  antString = true, antRawString = true, antRegex = true, antComment = true, antElement = true,
   antFragment = true, antElementNested = true, antRaw = true, antStartTag = true,
   antInterpolation = true, antMarkupInterpolation = true,
 }

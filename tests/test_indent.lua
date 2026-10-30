@@ -62,17 +62,22 @@ reindent({
   '     comment */',
   '  var s = `multi',
   'line`',
+  '  var t = "multi ${f(',
+  '      a)}',
+  '     line"',
   '  println(s)',
+  '  var u = "one" +',
+  '    "two"',
   '}',
 }, 'text', true)
 
--- Every formatted file of the corpus but those whose markup or template text fmt keeps as
+-- Every formatted file of the corpus but those whose markup or string text fmt keeps as
 -- written reindents to itself.
 local kept = {
   ['tests/run/html.ant'] = true,
   ['internal/format/testdata/blocks.out.ant'] = true,
   ['internal/format/testdata/html.out.ant'] = true,
-  ['internal/format/testdata/templates.out.ant'] = true,
+  ['internal/format/testdata/strings.out.ant'] = true,
 }
 local bad, total = {}, 0
 for _, f in ipairs(h.corpus()) do
