@@ -28,8 +28,9 @@ if ant then
   vim.cmd('Ant run')
   local term = vim.api.nvim_get_current_buf()
   h.eq('terminal', vim.bo[term].buftype, 'a terminal')
-  assert(vim.wait(10000, function()
-    return table.concat(vim.api.nvim_buf_get_lines(term, 0, -1, false), '\n'):find('Process exited 0', 1, true) ~= nil
-  end, 20), 'ant run ended: ' .. table.concat(vim.api.nvim_buf_get_lines(term, 0, -1, false), '\n'))
+  h.eq({ 0 }, vim.fn.jobwait({ vim.b[term].terminal_job_id }, 10000), 'ant run exit status')
+  vim.wait(500, function()
+    return vim.api.nvim_buf_get_lines(term, 0, 1, false)[1] == '1'
+  end, 20)
   h.eq('1', vim.api.nvim_buf_get_lines(term, 0, 1, false)[1], 'program output')
 end
