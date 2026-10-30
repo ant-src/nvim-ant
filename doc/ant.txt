@@ -28,7 +28,8 @@ Neovim gives Apache Ant's build.xml the filetype ant too; this plugin leaves
 >lua
     vim.g.ant = {
       path = nil,  -- the ant executable; nil looks on PATH, in $GOBIN,
-                   -- in the bin directory of `go env GOPATH`, and ~/go/bin
+                   -- in the bin directory of `go env GOPATH`, and ~/go/bin,
+                   -- passing over Apache Ant's launcher
       lsp = true,  -- start ant lsp for Ant files
       dap = true,  -- register ant dap with nvim-dap, when it is installed
     }

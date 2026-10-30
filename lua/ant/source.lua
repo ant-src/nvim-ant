@@ -37,15 +37,17 @@ function M.read(buf)
   vim.lsp.buf_attach_client(buf, c.id)
 end
 
--- adopt attaches the client to the loaded ant: buffers that have no server.
+-- adopt attaches the client to the loaded ant: buffers that have no running server; a stopped one
+-- may still be listed as attached for a moment after it exits.
 function M.adopt(c)
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    if
-      vim.api.nvim_buf_is_loaded(buf)
-      and vim.api.nvim_buf_get_name(buf):match('^ant:')
-      and #vim.lsp.get_clients({ bufnr = buf, name = 'ant' }) == 0
-    then
-      vim.lsp.buf_attach_client(buf, c.id)
+    if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_name(buf):match('^ant:') then
+      local running = vim.tbl_filter(function(other)
+        return not other:is_stopped()
+      end, vim.lsp.get_clients({ bufnr = buf, name = 'ant' }))
+      if #running == 0 then
+        vim.lsp.buf_attach_client(buf, c.id)
+      end
     end
   end
 end

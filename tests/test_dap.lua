@@ -72,6 +72,10 @@ assert(vim.wait(10000, function()
 end, 20), 'the breakpoint was not hit')
 h.eq('breakpoint', stopped.reason, 'stop reason')
 local session = assert(dap.session())
+-- nvim-dap asks for the stack after the stopped event
+assert(vim.wait(10000, function()
+  return session.current_frame ~= nil
+end, 20), 'no frame after the stop')
 local frame = session.current_frame
 h.eq(2, frame and frame.line, 'stopped at line 2')
 h.eq(vim.uv.fs_realpath(file), vim.uv.fs_realpath(frame.source.path), 'stopped in the file')

@@ -33,13 +33,25 @@ function M.setup(opts)
   end
 end
 
--- found caches where ant was found, until the options change; a miss is not cached, so that an
--- ant installed later is found by the next restart.
-local found
+-- found caches where ant was found, for the path option it was found with; a miss is not cached,
+-- so that an ant installed later is found by the next restart.
+local found, found_for
 
 local function executable(file)
   local stat = vim.uv.fs_stat(file)
   return stat ~= nil and stat.type == 'file' and vim.fn.executable(file) == 1
+end
+
+-- is_apache_ant tells Apache Ant's launcher script, which is also called ant and is often on PATH,
+-- from the Ant executable, which is a Go binary.
+local function is_apache_ant(file)
+  local f = io.open(file, 'rb')
+  if not f then
+    return false
+  end
+  local head = f:read(65536) or ''
+  f:close()
+  return head:sub(1, 2) == '#!' and head:find('ANT_HOME', 1, true) ~= nil
 end
 
 local function locate()
@@ -48,9 +60,11 @@ local function locate()
     return vim.fn.expand(configured)
   end
   local exe = vim.fn.has('win32') == 1 and 'ant.exe' or 'ant'
-  local onpath = vim.fn.exepath(exe)
-  if onpath ~= '' then
-    return onpath
+  for _, dir in ipairs(vim.split(vim.env.PATH or '', vim.fn.has('win32') == 1 and ';' or ':', { trimempty = true })) do
+    local candidate = vim.fs.joinpath(dir, exe)
+    if executable(candidate) and not is_apache_ant(candidate) then
+      return candidate
+    end
   end
   local gobin = vim.env.GOBIN
   if gobin and gobin ~= '' and executable(vim.fs.joinpath(gobin, exe)) then
@@ -74,8 +88,9 @@ end
 
 -- find returns the ant executable, or nil when there is none.
 function M.find()
-  if not found then
-    found = locate()
+  local path = M.options().path or ''
+  if not found or found_for ~= path then
+    found, found_for = locate(), path
   end
   return found
 end

@@ -88,7 +88,8 @@ require("dap").configurations.ant = {
 ## Apache Ant
 
 Neovim gives Apache Ant's `build.xml` the filetype `ant` too. This plugin leaves `.xml` files
-alone, so they keep their XML highlighting and get no Ant language server.
+alone, so they keep their XML highlighting and get no Ant language server. When looking on `PATH`,
+it passes over Apache Ant's `ant` launcher.
 
 ## Development
 
