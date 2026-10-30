@@ -1,0 +1,48 @@
+name: test
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        nvim: [v0.11.4, stable]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: nvim-ant
+          persist-credentials: false
+      - uses: actions/checkout@v5
+        with:
+          repository: ant-src/ant
+          path: ant
+          persist-credentials: false
+      - uses: actions/checkout@v5
+        with:
+          repository: mfussenegger/nvim-dap
+          path: nvim-dap
+          persist-credentials: false
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
+          cache: false
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: ${{ matrix.nvim }}
+      - name: build ant
+        working-directory: ant
+        run: go build -o "$RUNNER_TEMP/ant" ./cmd/ant
+      - name: test
+        working-directory: nvim-ant
+        env:
+          ANT_PATH: ${{ runner.temp }}/ant
+          ANT_CORPUS: ${{ github.workspace }}/ant
+          NVIM_DAP: ${{ github.workspace }}/nvim-dap
+        run: tests/run.sh

@@ -1,0 +1,13 @@
+-- Apache Ant's build.xml has the filetype ant as well; its own indent script loads after this one.
+if vim.b.did_indent or require('ant').is_build_xml(0) then
+  return
+end
+vim.b.did_indent = 1
+
+vim.bo.indentexpr = "v:lua.require'ant.indent'.get(v:lnum)"
+vim.bo.indentkeys = '0{,0},0),0],0<,!^F,o,O,e,0.,0|'
+vim.bo.autoindent = true
+vim.bo.smartindent = false
+vim.bo.cindent = false
+
+vim.b.undo_indent = 'setl inde< indk< ai< si< cin<'

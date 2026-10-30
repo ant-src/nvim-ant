@@ -1,0 +1,92 @@
+*ant.txt*  Support for the Ant programming language
+
+==============================================================================
+CONTENTS                                                        *ant-contents*
+
+  1. Introduction ........................................ |ant-introduction|
+  2. Options ............................................. |ant-options|
+  3. Commands ............................................ |ant-commands|
+  4. Language server ..................................... |ant-lsp|
+  5. Debugging ........................................... |ant-dap|
+
+==============================================================================
+1. Introduction                                             *ant-introduction*
+
+Highlighting, indentation, the `ant lsp` language server, and the `ant dap`
+debugger for Ant files (`*.ant`). Needs Neovim 0.11 or later and `ant`:
+>sh
+    go install github.com/ant-src/ant/cmd/ant@latest
+<
+The plugin needs no setup. |:checkhealth| ant says what it found.
+
+Neovim gives Apache Ant's build.xml the filetype ant too; this plugin leaves
+`.xml` files alone.
+
+==============================================================================
+2. Options                                                       *ant-options*
+                                                                       *g:ant*
+>lua
+    vim.g.ant = {
+      path = nil,  -- the ant executable; nil looks on PATH, in $GOBIN,
+                   -- in the bin directory of `go env GOPATH`, and ~/go/bin
+      lsp = true,  -- start ant lsp for Ant files
+      dap = true,  -- register ant dap with nvim-dap, when it is installed
+    }
+<
+                                                                 *ant.setup()*
+require("ant").setup({opts}) sets the same options, for plugin managers that
+call it.
+
+==============================================================================
+3. Commands                                                     *ant-commands*
+
+:Ant run [args]                                                     *:Ant-run*
+        Save the current file and run it with `ant run` in a terminal below,
+        with [args] after the file.
+
+:Ant debug [args]                                                 *:Ant-debug*
+        Save the current file and debug it with `ant dap`. Needs nvim-dap.
+
+:Ant restart                                                    *:Ant-restart*
+        Stop the language servers and start them again, looking for `ant`
+        afresh.
+
+:Ant log                                                            *:Ant-log*
+        Open the LSP log.
+
+|:make| runs `ant check` on the current file.
+
+==============================================================================
+4. Language server                                                   *ant-lsp*
+
+The configuration is named "ant" (|vim.lsp.config()|), so any field can be
+changed with:
+>lua
+    vim.lsp.config("ant", { ... })
+<
+A server starts for each project, the nearest directory with `.git` above a
+file, or the file's directory. Definition of a prelude name opens the prelude,
+`ant:/prelude.d.ant`, read-only, served by the server, where hover and
+definition work as in any file.
+
+Markup elements and attributes are highlighted through the groups
+`@lsp.type.element.ant` and `@lsp.type.attribute.ant`, linked to `@tag` and
+`@tag.attribute` by default.
+
+==============================================================================
+5. Debugging                                                         *ant-dap*
+
+With nvim-dap installed, the adapter "ant" and the configuration "Debug Ant
+file" are registered when the first Ant file opens. A configuration takes:
+
+    program      the file to run (required)
+    args         the program's arguments
+    cwd          the working directory; the program's directory by default
+    env          environment variables set over Neovim's
+    stdin        a file whose contents are the program's standard input
+    stopOnEntry  stop before the first statement of the program
+
+A relative program, cwd, or stdin is resolved against Neovim's working
+directory.
+
+ vim:tw=78:ts=8:ft=help:norl:
