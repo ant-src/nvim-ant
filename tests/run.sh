@@ -10,13 +10,18 @@ dap=
 if [ -n "${NVIM_DAP:-}" ]; then
   dap="set rtp+=$NVIM_DAP"
 fi
+# Every test uses ANT_PATH, so that an ant elsewhere on PATH, or none, does not matter.
+path=
+if [ -n "${ANT_PATH:-}" ]; then
+  path="lua vim.g.ant = { path = vim.env.ANT_PATH }"
+fi
 if [ $# -eq 0 ]; then
   set -- tests/test_*.lua
 fi
 for t in "$@"; do
   case $t in tests/*) ;; *) t=tests/$t.lua ;; esac
   printf '%s ' "$t"
-  if nvim --headless --clean --cmd "set rtp^=$root" --cmd "$dap" \
+  if nvim --headless --clean --cmd "set rtp^=$root" --cmd "$dap" --cmd "$path" \
     -c 'syntax on' -c 'filetype plugin indent on' \
     -c "lua local ok, err = xpcall(dofile, debug.traceback, '$t'); if not ok then io.stderr:write(err .. '\n'); vim.cmd('cquit 1') end; vim.cmd('qall!')" </dev/null; then
     echo ok
