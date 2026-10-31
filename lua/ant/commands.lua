@@ -1,4 +1,4 @@
--- The :Ant command: run, debug, restart, and the server's log.
+-- The :Ant command: run, debug, test, restart, and the server's log.
 local M = {}
 
 -- save_current saves the current Ant buffer and returns its file, or nil after saying why not.
@@ -19,6 +19,14 @@ function M.save_current()
   return vim.fn.fnamemodify(file, ':p')
 end
 
+-- terminal runs cmd in a terminal below and returns its buffer.
+function M.terminal(cmd)
+  vim.cmd('botright new')
+  vim.fn.jobstart(cmd, { term = true })
+  vim.bo.bufhidden = 'wipe'
+  return vim.api.nvim_get_current_buf()
+end
+
 -- run runs the current file with ant run in a terminal below, with args after the file.
 function M.run(args)
   local file = M.save_current()
@@ -30,9 +38,33 @@ function M.run(args)
     vim.notify(require('ant').install_hint, vim.log.levels.ERROR)
     return
   end
-  vim.cmd('botright new')
-  vim.fn.jobstart(vim.list_extend({ ant, 'run', file }, args), { term = true })
-  vim.bo.bufhidden = 'wipe'
+  M.terminal(vim.list_extend({ ant, 'run', file }, args))
+end
+
+-- test runs the tests of the current file, or of its companion's test file, matching pattern.
+function M.test(args)
+  local test = require('ant.test')
+  local file = test.target()
+  if file then
+    test.run(file, args[1])
+  end
+end
+
+-- test_nearest runs the test the cursor is in; test_debug debugs it, or the file's tests.
+local function nearest(fn)
+  return function()
+    local test = require('ant.test')
+    local file = M.save_current()
+    if not file then
+      return
+    end
+    local pattern = test.is_test_file(file) and test.nearest(0, vim.fn.line('.'))
+    if not pattern then
+      vim.notify('The cursor is not in a test.', vim.log.levels.INFO)
+      return
+    end
+    fn(file, pattern)
+  end
 end
 
 -- restart stops the language servers and, once they have exited, starts them again for the open
@@ -74,6 +106,16 @@ local subcommands = {
   debug = function(args)
     require('ant.dap').debug_file(args)
   end,
+  test = M.test,
+  ['test-all'] = function(args)
+    require('ant.test').run('.', args[1])
+  end,
+  ['test-nearest'] = nearest(function(file, pattern)
+    require('ant.test').run(file, pattern)
+  end),
+  ['debug-nearest'] = nearest(function(file, pattern)
+    require('ant.test').debug(file, pattern)
+  end),
   restart = M.restart,
   log = function()
     vim.cmd.tabnew(vim.lsp.log.get_filename())

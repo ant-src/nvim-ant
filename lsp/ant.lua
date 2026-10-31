@@ -9,6 +9,8 @@ return {
     return vim.lsp.rpc.start({ ant, 'lsp' }, dispatchers, { cwd = config.root_dir })
   end,
   filetypes = { 'ant' },
+  -- The commands of the code lenses above tests (spec/lsp.md, Code lenses).
+  commands = require('ant.test').lsp_commands,
   root_dir = function(buf, on_dir)
     if require('ant').is_build_xml(buf) then
       return

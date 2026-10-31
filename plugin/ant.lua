@@ -21,7 +21,7 @@ end, {
   complete = function(arglead, line)
     return require('ant.commands').complete(arglead, line)
   end,
-  desc = 'Ant: run, debug, restart, log',
+  desc = 'Ant: run, debug, test, restart, log',
 })
 
 local group = vim.api.nvim_create_augroup('ant', {})
@@ -34,13 +34,15 @@ vim.api.nvim_create_autocmd('BufReadCmd', {
   end,
 })
 
--- A server that starts, after a restart, takes over the ant: documents open from the one before.
+-- A server that starts, after a restart, takes over the ant: documents open from the one before;
+-- the code lenses of a test file are shown.
 vim.api.nvim_create_autocmd('LspAttach', {
   group = group,
   callback = function(args)
     local client = vim.lsp.get_client_by_id(args.data.client_id)
     if client and client.name == 'ant' then
       require('ant.source').adopt(client)
+      require('ant.test').codelens(args.buf, client)
     end
   end,
 })
