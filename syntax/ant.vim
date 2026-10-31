@@ -81,13 +81,13 @@ syn match antRegexClass '\[\%(\\.\|[^]\\]\)*\]' contained contains=antRegexEscap
 
 " Markup (section 5): < begins an element where an operand cannot end, followed by a letter.
 let s:markup = '\%(\%([=(,[{|:?!&>]\|\<return\)\s*\|^\s*\)\@<='
-execute 'syn region antElement matchgroup=antTag start=+' . s:markup . '<\z(\a[-[:alnum:]]*\)\%(\_s\|/\|>\)\@=+ end=+</\z1\s*>+ end=+/>+ contains=antStartTag,antElementNested,antRaw,antMarkupInterpolation,antEntity,antEntityError'
+execute 'syn region antElement matchgroup=antTag start=+' . s:markup . '<\z(\a[-[:alnum:]]*\)\%(\_s\|/\|>\)\@=+ end=+</\z1\_s*>+ end=+/>+ contains=antStartTag,antElementNested,antRaw,antMarkupInterpolation,antEntity,antEntityError'
 execute 'syn region antFragment matchgroup=antTag start=+' . s:markup . '<>+ end=+</>+ contains=antElementNested,antRaw,antMarkupInterpolation,antEntity,antEntityError'
-syn region antElementNested matchgroup=antTag start=+<\z(\a[-[:alnum:]]*\)\%(\_s\|/\|>\)\@=+ end=+</\z1\s*>+ end=+/>+ contained contains=antStartTag,antElementNested,antRaw,antMarkupInterpolation,antEntity,antEntityError
+syn region antElementNested matchgroup=antTag start=+<\z(\a[-[:alnum:]]*\)\%(\_s\|/\|>\)\@=+ end=+</\z1\_s*>+ end=+/>+ contained contains=antStartTag,antElementNested,antRaw,antMarkupInterpolation,antEntity,antEntityError
 syn region antElementNested matchgroup=antTag start=+<>+ end=+</>+ contained contains=antElementNested,antRaw,antMarkupInterpolation,antEntity,antEntityError
 " <script> and <style> hold literal text.
-syn region antRaw matchgroup=antTag start=+\c<\z(script\|style\)\%(\_s\|/\|>\)\@=+ end=+</\z1\s*>+ end=+/>+ contained contains=antStartTag
-execute 'syn region antRaw matchgroup=antTag start=+' . s:markup . '\c<\z(script\|style\)\%(\_s\|/\|>\)\@=+ end=+</\z1\s*>+ end=+/>+ contains=antStartTag'
+syn region antRaw matchgroup=antTag start=+\c<\z(script\|style\)\%(\_s\|/\|>\)\@=+ end=+</\z1\_s*>+ end=+/>+ contained contains=antStartTag
+execute 'syn region antRaw matchgroup=antTag start=+' . s:markup . '\c<\z(script\|style\)\%(\_s\|/\|>\)\@=+ end=+</\z1\_s*>+ end=+/>+ contains=antStartTag'
 " The start tag runs from the name to > or up to />.
 syn region antStartTag start=+\%(<\a[-[:alnum:]]*\)\@<=+ matchgroup=antTag end=+>+ end=+\ze/>+ contained contains=antAttribute,antAttributeString,antMarkupInterpolation
 syn match antAttribute '\<\h[-[:alnum:]_:.]*' contained
