@@ -8,6 +8,7 @@ CONTENTS                                                        *ant-contents*
   3. Commands ............................................ |ant-commands|
   4. Language server ..................................... |ant-lsp|
   5. Debugging ........................................... |ant-dap|
+  6. Tests ............................................... |ant-test|
 
 ==============================================================================
 1. Introduction                                             *ant-introduction*
@@ -47,6 +48,24 @@ call it.
 
 :Ant debug [args]                                                 *:Ant-debug*
         Save the current file and debug it with `ant dap`. Needs nvim-dap.
+        In a test file, it debugs every test of the file.
+
+:Ant test [pattern]                                                *:Ant-test*
+        Save the current file and run its tests with `ant test` in a
+        terminal below; from `name.ant`, the tests of `name_test.ant`.
+        [pattern] is passed as `-run`, a regular expression for each
+        `/`-separated level of the test names.
+
+:Ant test-all [pattern]                                        *:Ant-test-all*
+        Run `ant test` on Neovim's working directory, every test file under
+        it, with [pattern] as `-run`.
+
+:Ant test-nearest                                          *:Ant-test-nearest*
+        Run the test or subtest the cursor is in. A subtest whose name is not
+        a literal is passed over for the test around it.
+
+:Ant debug-nearest                                        *:Ant-debug-nearest*
+        Debug the test or subtest the cursor is in. Needs nvim-dap.
 
 :Ant restart                                                    *:Ant-restart*
         Stop the language servers and start them again, looking for `ant`
@@ -87,7 +106,23 @@ file" are registered when the first Ant file opens. A configuration takes:
     stdin        a file whose contents are the program's standard input
     stopOnEntry  stop before the first statement of the program
 
+    test         in a test file, the `-run` pattern of the tests to run
+
 A relative program, cwd, or stdin is resolved against Neovim's working
 directory.
+
+==============================================================================
+6. Tests                                                            *ant-test*
+
+Test files end in `_test.ant`; in them, `test "name" { ... }` is highlighted
+as a declaration. The language server puts two code lenses above each test,
+and each subtest whose name is a literal: "run test" runs it with `ant test`
+in a terminal below, and "debug test" debugs it with nvim-dap. Run the lens
+on the cursor's line with |vim.lsp.codelens.run()|, for example:
+>lua
+    vim.keymap.set("n", "<leader>l", vim.lsp.codelens.run)
+<
+The lenses' commands, `ant.test.run` and `ant.test.debug`, are in the
+`commands` of the "ant" configuration. See also |:Ant-test|.
 
  vim:tw=78:ts=8:ft=help:norl:

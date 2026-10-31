@@ -3,8 +3,8 @@
 Support for the [Ant](https://github.com/ant-src/ant) programming language in Neovim 0.11+:
 highlighting, indentation as `ant fmt` lays code out, the language features of `ant lsp`, including
 diagnostics, completion, hover, go to definition (into the prelude too), references, rename,
-formatting, inlay hints, and semantic highlighting, and debugging through `ant dap` with
-[nvim-dap](https://github.com/mfussenegger/nvim-dap).
+formatting, inlay hints, semantic highlighting, and code lenses to run or debug a test, and
+debugging through `ant dap` with [nvim-dap](https://github.com/mfussenegger/nvim-dap).
 
 ## Install ant
 
@@ -65,6 +65,10 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 
 - `:Ant run [args]` runs the current file with `ant run` in a terminal
 - `:Ant debug [args]` debugs the current file with `ant dap` (needs nvim-dap)
+- `:Ant test [pattern]` runs the tests of the current file, or of `name_test.ant` from `name.ant`,
+  with `ant test`; the pattern is passed as `-run`
+- `:Ant test-all [pattern]` runs every test under Neovim's working directory
+- `:Ant test-nearest` runs the test the cursor is in, and `:Ant debug-nearest` debugs it
 - `:Ant restart` restarts the language server
 - `:Ant log` opens the LSP log
 
@@ -84,6 +88,20 @@ require("dap").configurations.ant = {
   { type = "ant", request = "launch", name = "Debug main", program = "main.ant", args = { "-v" } },
 }
 ```
+
+## Tests
+
+In a test file (`*_test.ant`), the language server puts "run test" and "debug test" code lenses
+above each test and each subtest with a literal name. Run the one on the cursor's line with
+`vim.lsp.codelens.run()`, for example mapped:
+
+```lua
+vim.keymap.set("n", "<leader>l", vim.lsp.codelens.run)
+```
+
+"run test" runs `ant test -run <pattern> <file>` in a terminal; "debug test" launches `ant dap` with
+`test = <pattern>`, which a configuration of your own can set too. `:Ant debug` in a test file
+debugs all its tests.
 
 ## Apache Ant
 
