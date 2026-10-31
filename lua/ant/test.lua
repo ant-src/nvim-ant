@@ -7,9 +7,12 @@ function M.is_test_file(file)
   return file:match('_test%.ant$') ~= nil
 end
 
--- quote quotes a test name as a regular expression matching it alone, as ant lsp quotes one.
-function M.quote(name)
-  return '^' .. name:gsub('[\\.+*?()|%[%]{}^$]', '\\%0') .. '$'
+-- quote quotes a test name as a regular expression matching it alone, as ant lsp quotes one:
+-- each / escaped too, so it does not split the -run pattern, and for a subtest the name also with
+-- " #2", " #3" appended, which repeats of it are named.
+function M.quote(name, subtest)
+  local q = name:gsub('[\\.+*?()|%[%]{}^$/]', '\\%0')
+  return '^' .. q .. (subtest and '( #[0-9]+)?' or '') .. '$'
 end
 
 -- command returns the command line that runs the tests of path matching pattern, if any.
@@ -139,13 +142,16 @@ function M.nearest(buf, lnum)
           if quoted:find('[\\$"]') then
             names = {}
           else
-            table.insert(names, 1, M.quote(quoted))
+            table.insert(names, 1, quoted)
           end
         else
           names = rest:match('^test%s') and {} or names
         end
         if width == 0 then
           if quoted and #names > 0 then
+            for j, name in ipairs(names) do
+              names[j] = M.quote(name, j > 1)
+            end
             return table.concat(names, '/')
           end
           return nil
