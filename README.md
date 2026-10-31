@@ -32,8 +32,8 @@ git clone https://github.com/ant-src/nvim-ant ~/.local/share/nvim/site/pack/ant/
 ```
 
 The plugin needs no `setup()`. The language server starts for every `.ant` file. Use the usual
-Neovim mappings for its features: `K` for hover, `CTRL-]` for definition, `grn` to rename, `grr`
-for references, `gra` for code actions, and `vim.lsp.buf.format()` to format.
+Neovim mappings for its features: `K` for hover, `CTRL-]` for definition, `grn` to rename, `grr` for
+references, `gra` for code actions, and `vim.lsp.buf.format()` to format.
 
 ## Options
 
@@ -72,12 +72,12 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 
 ## Debugging
 
-With nvim-dap installed, `:Ant debug`, or `:lua require("dap").continue()` and the "Debug Ant
-file" configuration, debugs the current file. Breakpoints with conditions, hit counts, and log
-messages, stepping, every goroutine's stack and variables, and the REPL work as `ant dap` serves
-them. A configuration of your own takes the program and, optionally, its arguments, working
-directory, environment, a file for its standard input, and whether to stop on entry; a relative
-path is resolved against Neovim's working directory:
+With nvim-dap installed, `:Ant debug`, or `:lua require("dap").continue()` and the "Debug Ant file"
+configuration, debugs the current file. Breakpoints with conditions, hit counts, and log messages,
+stepping, every goroutine's stack and variables, and the REPL work as `ant dap` serves them. A
+configuration of your own takes the program and, optionally, its arguments, working directory,
+environment, a file for its standard input, and whether to stop on entry; a relative path is
+resolved against Neovim's working directory:
 
 ```lua
 require("dap").configurations.ant = {
@@ -87,9 +87,9 @@ require("dap").configurations.ant = {
 
 ## Apache Ant
 
-Neovim gives Apache Ant's `build.xml` the filetype `ant` too. This plugin leaves `.xml` files
-alone, so they keep their XML highlighting and get no Ant language server. When looking on `PATH`,
-it passes over Apache Ant's `ant` launcher.
+Neovim gives Apache Ant's `build.xml` the filetype `ant` too. This plugin leaves `.xml` files alone,
+so they keep their XML highlighting and get no Ant language server. When looking on `PATH`, it
+passes over Apache Ant's `ant` launcher.
 
 ## Development
 
