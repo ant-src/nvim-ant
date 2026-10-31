@@ -39,6 +39,12 @@ call s:words('antReserved', ['as', 'async', 'await', 'catch', 'class', 'const', 
 call s:words('antPrimitive', ['int', 'int8', 'int16', 'int32', 'int64', 'uint8', 'uint16',
       \ 'uint32', 'uint64', 'byte', 'float32', 'float64', 'string', 'bool', 'never'])
 
+" In a test file, test before a string declares a test (section 10, Tests); elsewhere, and after
+" ., it is a name.
+if expand('<afile>:t') =~# '_test\.ant$' || expand('%:t') =~# '_test\.ant$'
+  syn match antTest '\%(?\?\.\s*\)\@<!\<test\ze\s*["`]'
+endif
+
 " Capitalized names are types and namespaces; calls of lowercase names are functions.
 syn match antType '\%(?\?\.\s*\)\@<!\<\u\w*\>'
 syn match antFunction '\<\l\w*\ze\s*('
@@ -112,6 +118,7 @@ hi def link antInclude Include
 hi def link antBoolean Boolean
 hi def link antConstant Constant
 hi def link antReserved Error
+hi def link antTest Keyword
 hi def link antPrimitive Type
 hi def link antType Type
 hi def link antTypeName Typedef

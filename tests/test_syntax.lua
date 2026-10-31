@@ -82,6 +82,20 @@ h.eq('antString', h.group(20, 'two'), 'multi-line string')
 h.eq('antDelimiter', h.group(20, '${'), 'interpolation on a later line')
 h.eq('antStorage', h.group(21, 'var'), 'code after a multi-line string')
 
+-- In a test file, test before a string is a keyword; elsewhere, and after ., a name.
+h.buffer({
+  'test "parse" {',
+  '  test `raw` { Regex.test(r, "x") }',
+  '  var test = 1',
+  '}',
+}, 'parse_test.ant')
+h.eq('antTest', h.group(1, 'test'), 'test declaration')
+h.eq('antTest', h.group(2, 'test'), 'subtest with a raw name')
+h.eq('antFunction', h.group(2, 'test('), 'Regex.test')
+h.eq('', h.group(3, 'test'), 'test as a variable')
+h.buffer({ 'test "x" {}' }, 'plain.ant')
+h.eq('', h.group(1, 'test'), 'test outside a test file')
+
 -- Every file of the corpus ends outside any string, comment, regex, or markup, so no region runs away.
 local open = {
   antString = true, antRawString = true, antRegex = true, antComment = true, antElement = true,
