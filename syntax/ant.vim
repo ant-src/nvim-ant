@@ -60,6 +60,7 @@ syn match antTypeName '\h\w*' contained
 
 " Numbers. A float has digits on both sides of the point, an exponent, or both.
 syn match antNumber '\<0x\x\%(_\?\x\)*\>'
+syn match antNumber '\<0o\o\%(_\?\o\)*\>'
 syn match antNumber '\<0b[01]\%(_\?[01]\)*\>'
 syn match antNumber '\<\d\%(_\?\d\)*\>'
 syn match antFloat '\<\d\%(_\?\d\)*\.\d\%(_\?\d\)*\%(e[-+]\?\d\%(_\?\d\)*\)\?\>'

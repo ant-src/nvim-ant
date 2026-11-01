@@ -14,7 +14,7 @@ h.buffer({
   'var h = <div class="a" id={id}>if x &amp; <br /> {name}</div>',
   'var f = <>for <b>y</b></>',
   'var c = a < b',
-  'if 0x1F == 1_000 && 2.5e-3 > 1e9 { println(null) } else { await }',
+  'if 0x1F == 1_000 && 2.5e-3 > 1e9 + 0o17 { println(null) } else { await }',
   '/* block',
   '   comment */ var after = true',
   'var st = <style>a { color: red } if</style>',
@@ -63,6 +63,7 @@ h.eq('antFragment', h.group(12, 'for'), 'fragment text')
 h.eq('antTag', h.group(12, '</>'), 'fragment end')
 h.eq('antOperator', h.group(13, '<'), 'comparison')
 h.eq('antNumber', h.group(14, '0x1F'), 'hex')
+h.eq('antNumber', h.group(14, '0o17'), 'octal')
 h.eq('antNumber', h.group(14, '1_000'), 'separated digits')
 h.eq('antFloat', h.group(14, '2.5e-3'), 'float')
 h.eq('antFloat', h.group(14, '1e9'), 'exponent')
