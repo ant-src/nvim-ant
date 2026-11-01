@@ -99,7 +99,7 @@ M.lsp_commands = {
 }
 
 -- target returns the test file of the current file, or nil after saying why not: the file itself,
--- or the companion's test file, name_test.ant beside name.ant.
+-- or name_test.ant beside name.ant.
 function M.target()
   local file = require('ant.commands').save_current()
   if not file then
