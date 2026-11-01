@@ -5,7 +5,8 @@ end
 vim.b.did_indent = 1
 
 vim.bo.indentexpr = "v:lua.require'ant.indent'.get(v:lnum)"
-vim.bo.indentkeys = '0{,0},0),0],0<,!^F,o,O,e,0.,0|'
+-- <<> is a typed <: a bare < would start a key name and swallow the keys after it.
+vim.bo.indentkeys = '0{,0},0),0],0<<>,!^F,o,O,e,0.,0|'
 vim.bo.autoindent = true
 vim.bo.smartindent = false
 vim.bo.cindent = false

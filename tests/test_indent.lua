@@ -71,6 +71,22 @@ reindent({
   '}',
 }, 'text', true)
 
+-- Typing indents too: Enter and o open a line at its indent, and a typed } goes back a level.
+do
+  local buf = h.buffer({})
+  vim.api.nvim_feedkeys(vim.keycode('ifunc main() {<CR>if x {<CR>println(1)<CR>}<CR>}<Esc>'), 'xt', false)
+  vim.api.nvim_feedkeys(vim.keycode('ggox<Esc>'), 'xt', false)
+  h.eq({
+    'func main() {',
+    '  x',
+    '  if x {',
+    '    println(1)',
+    '  }',
+    '}',
+  }, vim.api.nvim_buf_get_lines(buf, 0, -1, false), 'typing')
+  vim.cmd('silent! bwipeout!')
+end
+
 -- Every formatted file of the corpus but those whose markup or string text fmt keeps as
 -- written reindents to itself.
 local kept = {
