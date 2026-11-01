@@ -71,21 +71,47 @@ reindent({
   '}',
 }, 'text', true)
 
--- Typing indents too: Enter and o open a line at its indent, and a typed } goes back a level.
-do
+-- Typing indents too: Enter, o and O open a line at its indent; a typed }, end tag, or leading .
+-- or | moves the line to its own.
+local function typed(keys, want, what)
   local buf = h.buffer({})
-  vim.api.nvim_feedkeys(vim.keycode('ifunc main() {<CR>if x {<CR>println(1)<CR>}<CR>}<Esc>'), 'xt', false)
-  vim.api.nvim_feedkeys(vim.keycode('ggox<Esc>'), 'xt', false)
-  h.eq({
-    'func main() {',
-    '  x',
-    '  if x {',
-    '    println(1)',
-    '  }',
-    '}',
-  }, vim.api.nvim_buf_get_lines(buf, 0, -1, false), 'typing')
+  for _, k in ipairs(keys) do
+    vim.api.nvim_feedkeys(vim.keycode(k), 'xt', false)
+  end
+  h.eq(want, vim.api.nvim_buf_get_lines(buf, 0, -1, false), what)
   vim.cmd('silent! bwipeout!')
 end
+
+typed({ 'ifunc main() {<CR>if x {<CR>println(1)<CR>}<CR>}<Esc>', 'ggox<Esc>', 'jOy<Esc>' }, {
+  'func main() {',
+  '  x',
+  '  y',
+  '  if x {',
+  '    println(1)',
+  '  }',
+  '}',
+}, 'typing blocks')
+
+typed({ 'ivar page = <div><CR><p>hi</p><CR></div><Esc>' }, {
+  'var page = <div>',
+  '  <p>hi</p>',
+  '</div>',
+}, 'typing markup')
+
+typed({ 'ivar p = point<CR>.x<CR>var n = xs<CR>| Array.first()<Esc>' }, {
+  'var p = point',
+  '  .x',
+  'var n = xs',
+  '  | Array.first()',
+}, 'typing continuations')
+
+typed({ 'ivar xs = [<CR>...ys,<CR>]<CR>var ok = a<CR>|| b<Esc>' }, {
+  'var xs = [',
+  '  ...ys,',
+  ']',
+  'var ok = a',
+  '|| b',
+}, 'typing a spread and ||, which reindent as == does')
 
 -- Every formatted file of the corpus but those whose markup or string text fmt keeps as
 -- written reindents to itself.

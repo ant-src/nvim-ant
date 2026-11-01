@@ -148,7 +148,8 @@ end
 -- statement above.
 local function starts_continuation(lnum)
   local code = info(lnum).code
-  return code:match('^%.[^.]') ~= nil or code:match('^%?%.') ~= nil or code:match('^|[^|]') ~= nil or code == '|'
+  -- A lone . or | is one being typed: the line is reindented again if it turns out to be ... or ||.
+  return code:match('^%.[^.]') ~= nil or code == '.' or code:match('^%?%.') ~= nil or code:match('^|[^|]') ~= nil or code == '|'
 end
 
 -- is_continuation tells whether a line continues the statement of the line above it.
