@@ -30,12 +30,12 @@ call s:words('antConditional', ['if', 'else', 'select'])
 call s:words('antRepeat', ['for', 'while', 'in'])
 call s:words('antStatement', ['return', 'break', 'continue', 'go', 'defer', 'try'])
 call s:words('antOperatorWord', ['is'])
-call s:words('antStorage', ['var', 'func', 'type'])
+call s:words('antStorage', ['var', 'let', 'func', 'type'])
 call s:words('antInclude', ['import', 'export'])
 call s:words('antBoolean', ['true', 'false'])
 call s:words('antConstant', ['null', 'void'])
 call s:words('antReserved', ['as', 'async', 'await', 'catch', 'class', 'const', 'enum', 'finally',
-      \ 'function', 'interface', 'let', 'match', 'switch', 'this', 'throw', 'undefined'])
+      \ 'function', 'interface', 'match', 'switch', 'this', 'throw', 'undefined'])
 call s:words('antPrimitive', ['int', 'int8', 'int16', 'int32', 'int64', 'uint8', 'uint16',
       \ 'uint32', 'uint64', 'byte', 'float32', 'float64', 'string', 'bool', 'never'])
 

@@ -22,6 +22,7 @@ h.buffer({
   'var ml = "one',
   'two ${n} three"',
   'var after2 = 1',
+  'let fixed = const',
 })
 vim.bo.filetype = 'ant'
 
@@ -82,6 +83,8 @@ h.eq('antStorage', h.group(18, 'var'), 'code before a raw string')
 h.eq('antString', h.group(20, 'two'), 'multi-line string')
 h.eq('antDelimiter', h.group(20, '${'), 'interpolation on a later line')
 h.eq('antStorage', h.group(21, 'var'), 'code after a multi-line string')
+h.eq('antStorage', h.group(22, 'let'), 'let')
+h.eq('antReserved', h.group(22, 'const'), 'const stays reserved')
 
 -- In a test file, test before a string is a keyword; elsewhere, and after ., a name.
 h.buffer({
