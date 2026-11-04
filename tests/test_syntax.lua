@@ -23,6 +23,7 @@ h.buffer({
   'two ${n} three"',
   'var after2 = 1',
   'let fixed = const',
+  'var ty = type(Array[Point] | null) == type(int)',
 })
 vim.bo.filetype = 'ant'
 
@@ -84,6 +85,11 @@ h.eq('antString', h.group(20, 'two'), 'multi-line string')
 h.eq('antDelimiter', h.group(20, '${'), 'interpolation on a later line')
 h.eq('antStorage', h.group(21, 'var'), 'code after a multi-line string')
 h.eq('antStorage', h.group(22, 'let'), 'let')
+h.eq('antStorage', h.group(23, 'type('), 'type expression keyword')
+h.eq('antType', h.group(23, 'Array'), 'type in a type expression')
+h.eq('antType', h.group(23, 'Point'), 'type argument in a type expression')
+h.eq('antConstant', h.group(23, 'null'), 'null in a type expression')
+h.eq('antPrimitive', h.group(23, 'int)'), 'primitive in a type expression')
 h.eq('antReserved', h.group(22, 'const'), 'const stays reserved')
 
 -- In a test file, test before a string is a keyword; elsewhere, and after ., a name.

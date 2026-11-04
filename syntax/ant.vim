@@ -49,6 +49,8 @@ endif
 syn match antType '\%(?\?\.\s*\)\@<!\<\u\w*\>'
 syn match antFunction '\<\l\w*\ze\s*('
 syn match antFunction '\<_\w\+\ze\s*('
+" type before ( is a type expression, type(T), not a call (section 4, Types as values).
+syn match antStorage '\%(?\?\.\s*\)\@<!\<type\ze\s*('
 syn match antBuiltin '\%(?\?\.\s*\)\@<!\<\%(print\|println\|eprint\|eprintln\|panic\|len\)\ze\s*('
 
 " Declarations: func Type.name, type Name.
