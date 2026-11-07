@@ -81,8 +81,9 @@ With nvim-dap installed, `:Ant debug`, or `:lua require("dap").continue()` and t
 configuration, debugs the current file. Breakpoints with conditions, hit counts, and log messages,
 stepping, every goroutine's stack and variables, and the REPL work as `ant dap` serves them. A
 configuration of your own takes the program and, optionally, its arguments, working directory,
-environment, a file for its standard input, and whether to stop on entry; a relative path is
-resolved against Neovim's working directory:
+environment, a file for its standard input, and whether to stop on entry. A relative working
+directory is resolved against Neovim's, a relative program against the working directory (or
+Neovim's without one), and a relative standard input file against the program's working directory:
 
 ```lua
 require("dap").configurations.ant = {

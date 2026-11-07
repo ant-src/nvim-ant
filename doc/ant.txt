@@ -114,8 +114,9 @@ file" are registered when the first Ant file opens. A configuration takes:
 
     test         in a test file, the `-run` pattern of the tests to run
 
-A relative program, cwd, or stdin is resolved against Neovim's working
-directory.
+A relative cwd is resolved against Neovim's working directory, a relative
+program against cwd (or Neovim's working directory without one), and a
+relative stdin against the program's working directory.
 
 ==============================================================================
 6. Tests                                                            *ant-test*

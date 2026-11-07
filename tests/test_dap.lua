@@ -27,11 +27,17 @@ if not real then
   h.eq('/x', adapter.options.cwd, 'adapter cwd is the program directory')
 
   local enriched
-  adapter.enrich_config({ program = 'a/main.ant', stdin = '/in.txt', cwd = 'b' }, function(c)
+  adapter.enrich_config({ program = 'a/main.ant', stdin = 'in.txt', cwd = 'b' }, function(c)
     enriched = c
   end)
-  h.eq(vim.fs.joinpath(cwd, 'a/main.ant'), enriched.program, 'relative program')
+  h.eq(vim.fs.joinpath(cwd, 'b/a/main.ant'), enriched.program, 'relative program against cwd')
   h.eq(vim.fs.joinpath(cwd, 'b'), enriched.cwd, 'relative cwd')
+  h.eq('in.txt', enriched.stdin, 'relative stdin, left to ant dap')
+  adapter.enrich_config({ program = 'a/main.ant', stdin = '/in.txt' }, function(c)
+    enriched = c
+  end)
+  h.eq(vim.fs.joinpath(cwd, 'a/main.ant'), enriched.program, 'relative program without cwd')
+  h.eq(nil, enriched.cwd, 'no cwd')
   h.eq('/in.txt', enriched.stdin, 'absolute stdin')
 
   -- A configuration of the user's own is kept.

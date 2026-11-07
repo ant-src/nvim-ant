@@ -9,14 +9,15 @@ local function resolve(base, file)
   return vim.fs.normalize(vim.fs.joinpath(base, file))
 end
 
--- enrich makes a relative program, cwd, or stdin absolute against Neovim's working directory, as
--- a launch.json path is read against the workspace folder; ant dap would read it against its own.
+-- enrich makes a relative cwd absolute against Neovim's working directory, as a launch.json path
+-- is read against the workspace folder, and a relative program against cwd, as ant dap reads it
+-- (dap.md), or against Neovim's working directory without one, since the adapter runs in the
+-- program's directory. A relative stdin is left to ant dap, which reads it against cwd.
 local function enrich(config, on_config)
   config = vim.deepcopy(config)
-  local base = vim.fn.getcwd()
-  config.program = resolve(base, config.program)
-  config.cwd = resolve(base, config.cwd)
-  config.stdin = resolve(base, config.stdin)
+  config.cwd = resolve(vim.fn.getcwd(), config.cwd)
+  local has_cwd = type(config.cwd) == 'string' and config.cwd ~= ''
+  config.program = resolve(has_cwd and config.cwd or vim.fn.getcwd(), config.program)
   on_config(config)
 end
 
