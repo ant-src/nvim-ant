@@ -14,6 +14,6 @@ vim.bo.formatoptions = vim.bo.formatoptions:gsub('t', '') .. 'croql'
 vim.bo.suffixesadd = '.ant'
 vim.bo.include = [[^\s*import\s\+"\zs[^"]\+\ze"]]
 vim.bo.makeprg = 'ant check %:S'
-vim.bo.errorformat = '%f:%l:%c: %m'
+vim.bo.errorformat = '%f:%l:%c: %m,%-G%.%#'
 
 vim.b.undo_ftplugin = 'setl et< sw< sts< cms< com< fo< sua< inc< mp< efm<'
