@@ -41,6 +41,40 @@ h.eq('^parse$', test.nearest(nb, 11), 'on the brace closing a test')
 h.eq(nil, test.nearest(nb, 12), 'between tests')
 h.eq('^a\\.b$', test.nearest(nb, 14), 'quoted')
 
+-- Lines of strings and comments at column 0 do not end the test they are in, with syntax
+-- highlighting and without.
+local text = {
+  'test "render" {', -- 1
+  '  var want = `<ul>', -- 2
+  '<li>a</li>', -- 3
+  '</ul>`', -- 4
+  '  assert(render() == want)', -- 5
+  '  var s = "one', -- 6
+  'two \\" } ${f("x")}', -- 7
+  'three"', -- 8
+  '/* a', -- 9
+  'test "no" {', -- 10
+  '*/', -- 11
+  '// test "nor" {', -- 12
+  '  check()', -- 13
+  '}', -- 14
+}
+for _, synon in ipairs({ false, true }) do
+  local tb = h.buffer(text, 'render_test.ant')
+  if not synon then
+    vim.cmd('syntax off')
+  end
+  local how = synon and ' with syntax' or ' without syntax'
+  h.eq(synon and 'ant' or nil, vim.b[tb].current_syntax, 'syntax' .. how)
+  h.eq('^render$', test.nearest(tb, 3), 'in a raw string' .. how)
+  h.eq('^render$', test.nearest(tb, 5), 'after a raw string' .. how)
+  h.eq('^render$', test.nearest(tb, 8), 'in a string' .. how)
+  h.eq('^render$', test.nearest(tb, 13), 'after comments' .. how)
+  h.eq('^render$', test.nearest(tb, 14), 'on the closing brace' .. how)
+  vim.cmd('syntax on')
+  vim.cmd('silent! bwipeout!')
+end
+
 local ant = h.ant()
 if not ant then
   io.stdout:write('skipped: no ant; set ANT_PATH\n')

@@ -116,16 +116,67 @@ function M.target()
   return nil
 end
 
+-- in_text tells, for each of lines, the first lines of buf, whether it starts inside a string, a
+-- raw string, or a comment, whose lines, at whatever indent, say nothing of the tests around them.
+-- Without syntax highlighting, a scan for quotes and comments tells.
+local function in_text(buf, lines)
+  local skip = {}
+  if vim.b[buf].current_syntax == 'ant' then
+    local in_kept = require('ant.indent').in_kept
+    vim.api.nvim_buf_call(buf, function()
+      for i, line in ipairs(lines) do
+        local first = line:find('%S')
+        skip[i] = first ~= nil and in_kept(i, first)
+      end
+    end)
+    return skip
+  end
+  local open -- the ", ` or /* the scan is inside, if any
+  for i, line in ipairs(lines) do
+    local first = line:find('%S')
+    skip[i] = first ~= nil and (open ~= nil or line:find('^/[/*]', first) ~= nil)
+    local j = 1
+    while j <= #line do
+      local c, two = line:sub(j, j), line:sub(j, j + 1)
+      if open == '"' then
+        if c == '\\' then
+          j = j + 1
+        elseif c == '"' then
+          open = nil
+        end
+      elseif open == '`' then
+        if c == '`' then
+          open = nil
+        end
+      elseif open == '/*' then
+        if two == '*/' then
+          open, j = nil, j + 1
+        end
+      elseif c == '"' or c == '`' then
+        open = c
+      elseif two == '/*' then
+        open, j = two, j + 1
+      elseif two == '//' then
+        break
+      end
+      j = j + 1
+    end
+  end
+  return skip
+end
+
 -- nearest returns the -run pattern of the test or subtest the cursor is in, from the lines above
--- it, or nil. A subtest whose name is not a literal is passed over for its parent.
+-- it, or nil. A subtest whose name is not a literal is passed over for its parent, and lines in
+-- strings and comments are passed over.
 function M.nearest(buf, lnum)
   local lines = vim.api.nvim_buf_get_lines(buf, 0, lnum, false)
+  local skip = in_text(buf, lines)
   local names = {}
   local limit = math.huge
   for i = #lines, 1, -1 do
     local line = lines[i]
     local indent, rest = line:match('^(%s*)(%S.*)$')
-    if indent then
+    if indent and not skip[i] then
       local width = #indent
       if i == #lines then
         -- The cursor's own line counts, if it declares a test; on a closing brace, the cursor is

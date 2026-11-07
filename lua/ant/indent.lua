@@ -114,6 +114,7 @@ local function in_kept(lnum, col)
   end
   return false
 end
+M.in_kept = in_kept
 
 -- inside_text tells whether a line starts inside a string, a raw string, or a block comment that
 -- began on a line above: the line above ends inside it too.
