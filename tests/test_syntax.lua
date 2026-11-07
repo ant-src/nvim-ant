@@ -99,6 +99,28 @@ h.eq('antRegex', h.group(25, '/{/'), 'regex at the start of a continuation line'
 h.eq('antString', h.group(25, '""'), 'string after a regex on a continuation line')
 h.eq('antOperator', h.group(27, '/ count'), 'division at the start of a continuation line')
 
+-- A keyword before ( stays a keyword; a name before ( is a call.
+h.buffer({
+  'if (a) { while (b) { for (x in xs) { go (f)() } } }',
+  'func f(g: func(int): bool) { return (try (g(1))) }',
+  'var h = func(a: int) { x.if(1) + foo(1) + _bar(2) }',
+  'print(type(int))',
+})
+h.eq('antConditional', h.group(1, 'if'), 'if before (')
+h.eq('antRepeat', h.group(1, 'while'), 'while before (')
+h.eq('antRepeat', h.group(1, 'for'), 'for before (')
+h.eq('antStatement', h.group(1, 'go'), 'go before (')
+h.eq('antStorage', h.group(2, 'func('), 'func type')
+h.eq('antStatement', h.group(2, 'return'), 'return before (')
+h.eq('antStatement', h.group(2, 'try'), 'try before (')
+h.eq('antFunction', h.group(2, 'g(1)'), 'call of a parameter')
+h.eq('antStorage', h.group(3, 'func'), 'func literal')
+h.eq('antFunction', h.group(3, 'if(1)'), 'keyword after . before (')
+h.eq('antFunction', h.group(3, 'foo'), 'call')
+h.eq('antFunction', h.group(3, '_bar'), 'call of an underscore name')
+h.eq('antBuiltin', h.group(4, 'print'), 'prelude call')
+h.eq('antStorage', h.group(4, 'type'), 'type expression')
+
 -- In a test file, test before a string is a keyword; elsewhere, and after ., a name.
 h.buffer({
   'test "parse" {',

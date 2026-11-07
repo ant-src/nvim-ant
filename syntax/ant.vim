@@ -26,6 +26,10 @@ function! s:words(group, words) abort
   execute 'syn match ' . a:group . ' "' . s:pre . '\%(' . join(a:words, '\|') . '\)' . s:post . '"'
 endfunction
 
+" Calls of lowercase names are functions; the keywords below come later and win, so if (, for (,
+" return ( and func( stay keywords.
+syn match antFunction '\<\l\w*\ze\s*('
+syn match antFunction '\<_\w\+\ze\s*('
 call s:words('antConditional', ['if', 'else', 'select'])
 call s:words('antRepeat', ['for', 'while', 'in'])
 call s:words('antStatement', ['return', 'break', 'continue', 'go', 'defer', 'try'])
@@ -45,10 +49,8 @@ if expand('<afile>:t') =~# '_test\.ant$' || expand('%:t') =~# '_test\.ant$'
   syn match antTest '\%(?\?\.\s*\)\@<!\<test\ze\s*["`]'
 endif
 
-" Capitalized names are types and namespaces; calls of lowercase names are functions.
+" Capitalized names are types and namespaces.
 syn match antType '\%(?\?\.\s*\)\@<!\<\u\w*\>'
-syn match antFunction '\<\l\w*\ze\s*('
-syn match antFunction '\<_\w\+\ze\s*('
 " type before ( is a type expression, type(T), not a call (section 4, Types as values).
 syn match antStorage '\%(?\?\.\s*\)\@<!\<type\ze\s*('
 syn match antBuiltin '\%(?\?\.\s*\)\@<!\<\%(print\|println\|eprint\|eprintln\|panic\|len\)\ze\s*('
