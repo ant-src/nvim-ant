@@ -78,6 +78,8 @@ local function locate()
       return vim.system({ 'go', 'env', 'GOPATH' }, { text = true }):wait(5000)
     end)
     local gopath = ok and res.code == 0 and vim.trim(res.stdout or '') or ''
+    -- GOPATH is a list; go install puts binaries in the bin directory of its first entry.
+    gopath = vim.split(gopath, vim.fn.has('win32') == 1 and ';' or ':', { trimempty = true })[1] or ''
     if gopath ~= '' and executable(vim.fs.joinpath(gopath, 'bin', exe)) then
       return vim.fs.joinpath(gopath, 'bin', exe)
     end

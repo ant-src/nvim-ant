@@ -20,3 +20,17 @@ vim.g.ant = { path = '/somewhere/ant' }
 h.eq('/somewhere/ant', ant.find(), 'path option')
 vim.g.ant = nil
 h.eq(vim.fs.joinpath(real, 'ant'), ant.find(), 'path option removed')
+
+-- Of a GOPATH with several entries, ant is looked for in the bin directory of the first.
+local gopath1, gopath2, godir = vim.fs.joinpath(dir, 'gp1'), vim.fs.joinpath(dir, 'gp2'), vim.fs.joinpath(dir, 'go')
+vim.fn.mkdir(vim.fs.joinpath(gopath1, 'bin'), 'p')
+vim.fn.mkdir(gopath2, 'p')
+vim.fn.mkdir(godir, 'p')
+vim.fn.writefile({ '#!/bin/sh', 'exec true' }, vim.fs.joinpath(gopath1, 'bin', 'ant'))
+vim.fn.setfperm(vim.fs.joinpath(gopath1, 'bin', 'ant'), 'rwxr-xr-x')
+vim.fn.writefile({ '#!/bin/sh', 'echo ' .. gopath1 .. ':' .. gopath2 }, vim.fs.joinpath(godir, 'go'))
+vim.fn.setfperm(vim.fs.joinpath(godir, 'go'), 'rwxr-xr-x')
+vim.env.PATH = godir
+vim.env.GOBIN = nil
+ant.forget()
+h.eq(vim.fs.joinpath(gopath1, 'bin', 'ant'), ant.find(), 'first GOPATH entry')
