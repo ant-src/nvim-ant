@@ -82,9 +82,9 @@ syn region antInterpolation matchgroup=antDelimiter start='\${' end='}' containe
 " Braces nest, so that the } of a lambda or record inside ${...} or {...} does not end it.
 syn region antBraces start='{' end='}' transparent contains=TOP
 
-" A / begins a regular expression after a token that is not an operand (section 2); this looks
-" one character back, as far as a pattern on one line can.
-syn region antRegex start='\%(\%([-(,=:[{|!&?+*%<>]\|\<return\|\<break\|\<continue\)\s*\)\@<=/[/*]\@!' skip='\\.\|\[\%(\\.\|[^]\\]\)*\]' end='/[ims]*' oneline contains=antRegexClass,antRegexEscape
+" A / begins a regular expression after a token that is not an operand (section 2), skipping line
+" breaks; this looks one character back.
+syn region antRegex start='\%(\%([-(,=:[{|!&?+*%<>]\|\<return\|\<break\|\<continue\)\_s*\)\@<=/[/*]\@!' skip='\\.\|\[\%(\\.\|[^]\\]\)*\]' end='/[ims]*' oneline contains=antRegexClass,antRegexEscape
 syn match antRegexEscape '\\.' contained
 syn match antRegexClass '\[\%(\\.\|[^]\\]\)*\]' contained contains=antRegexEscape
 

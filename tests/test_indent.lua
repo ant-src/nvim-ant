@@ -37,6 +37,12 @@ reindent({
 }, 'continuations')
 
 reindent({
+  'var r = Regex.replace(s,',
+  '  /{/, "")',
+  'var n = 1',
+}, 'a regex at the start of a continuation line')
+
+reindent({
   'var xs = [',
   '  first,',
   '  ...rest',

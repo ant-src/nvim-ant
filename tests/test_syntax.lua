@@ -24,6 +24,10 @@ h.buffer({
   'var after2 = 1',
   'let fixed = const',
   'var ty = type(Array[Point] | null) == type(int)',
+  'var rs = Regex.replace(s,',
+  '  /{/, "")',
+  'var avg = (total',
+  '  / count)',
 })
 vim.bo.filetype = 'ant'
 
@@ -91,6 +95,9 @@ h.eq('antType', h.group(23, 'Point'), 'type argument in a type expression')
 h.eq('antConstant', h.group(23, 'null'), 'null in a type expression')
 h.eq('antPrimitive', h.group(23, 'int)'), 'primitive in a type expression')
 h.eq('antReserved', h.group(22, 'const'), 'const stays reserved')
+h.eq('antRegex', h.group(25, '/{/'), 'regex at the start of a continuation line')
+h.eq('antString', h.group(25, '""'), 'string after a regex on a continuation line')
+h.eq('antOperator', h.group(27, '/ count'), 'division at the start of a continuation line')
 
 -- In a test file, test before a string is a keyword; elsewhere, and after ., a name.
 h.buffer({
