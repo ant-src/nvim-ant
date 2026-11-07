@@ -13,6 +13,9 @@ local defaults = {
   lsp = true,
   -- Register `ant dap` with nvim-dap, when it is installed.
   dap = true,
+  -- Enable vim.lsp.completion for the server, so that accepting an item from the omnifunc, CTRL-X
+  -- CTRL-O, expands its snippet, Array.filter(...) for xs | filt.
+  completion = true,
 }
 
 -- options returns vim.g.ant over the defaults.

@@ -35,7 +35,8 @@ vim.api.nvim_create_autocmd('BufReadCmd', {
 })
 
 -- A server that starts, after a restart, takes over the ant: documents open from the one before;
--- the code lenses of a test file are shown.
+-- the code lenses of a test file are shown; completion is enabled, without autotrigger, so that an
+-- accepted item's snippet expands.
 vim.api.nvim_create_autocmd('LspAttach', {
   group = group,
   callback = function(args)
@@ -43,6 +44,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
     if client and client.name == 'ant' then
       require('ant.source').adopt(client)
       require('ant.test').codelens(args.buf, client)
+      if ant.options().completion then
+        vim.lsp.completion.enable(true, client.id, args.buf)
+      end
     end
   end,
 })

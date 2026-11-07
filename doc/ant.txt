@@ -33,6 +33,7 @@ Neovim gives Apache Ant's build.xml the filetype ant too; this plugin leaves
                    -- passing over Apache Ant's launcher
       lsp = true,  -- start ant lsp for Ant files
       dap = true,  -- register ant dap with nvim-dap, when it is installed
+      completion = true,  -- enable |lsp-completion| for ant lsp
     }
 <
                                                                  *ant.setup()*
@@ -88,6 +89,11 @@ A server starts for each project, the nearest directory with `.git` above a
 file, or the file's directory. Definition of a prelude name opens the prelude,
 `ant:/prelude.d.ant`, read-only, served by the server, where hover and
 definition work as in any file.
+
+Completion is enabled with |vim.lsp.completion.enable()|, without
+autotrigger, so that accepting an item from |i_CTRL-X_CTRL-O| with CTRL-Y
+expands its snippet: `xs | filt` becomes `xs | Array.filter()`. Set
+`completion = false` to leave completion to another plugin.
 
 Markup elements and attributes are highlighted through the groups
 `@lsp.type.element.ant` and `@lsp.type.attribute.ant`, linked to `@tag` and

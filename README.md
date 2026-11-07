@@ -42,6 +42,7 @@ vim.g.ant = {
   path = nil,  -- the ant executable; nil looks on PATH and in the Go bin directories
   lsp = true,  -- start ant lsp for Ant files
   dap = true,  -- register ant dap with nvim-dap, when it is installed
+  completion = true,  -- enable vim.lsp.completion, so CTRL-X CTRL-O expands snippets
 }
 ```
 

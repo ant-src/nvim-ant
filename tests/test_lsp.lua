@@ -98,3 +98,41 @@ end)
 wait('the new client on the prelude', function()
   return client(prelude) ~= nil and client(prelude).id ~= old
 end)
+
+-- Completion: accepting an item from the omnifunc expands its snippet, so xs | filt becomes
+-- xs | Array.filter(), and without the completion option inserts the item's filter text alone.
+-- Insert mode is driven in a child Neovim, whose input does not block this one.
+local function complete(enabled)
+  local cfile = vim.fs.joinpath(vim.fn.tempname(), 'complete.ant')
+  vim.fn.mkdir(vim.fs.dirname(cfile), 'p')
+  vim.fn.writefile({ 'func main() {', '  var xs = [1, 2]', '  var ys = xs | filt', '}' }, cfile)
+  local opts = ('vim.g.ant = { path = %q, completion = %s }'):format(ant, tostring(enabled))
+  local chan = vim.fn.jobstart({
+    vim.v.progpath, '--embed', '--headless', '--clean', '--cmd', 'set rtp^=' .. vim.fn.getcwd(),
+    '--cmd', 'lua ' .. opts, '-c', 'syntax on', '-c', 'filetype plugin indent on', cfile,
+  }, { rpc = true })
+  local function eval(code)
+    return vim.rpcrequest(chan, 'nvim_exec_lua', code, {})
+  end
+  local ok, res = pcall(function()
+    wait('the client in the child', function()
+      return eval("local c = vim.lsp.get_clients({ bufnr = 0, name = 'ant' })[1] return c ~= nil and c.initialized")
+    end)
+    vim.rpcrequest(chan, 'nvim_win_set_cursor', 0, { 3, 0 })
+    vim.rpcrequest(chan, 'nvim_input', 'A<C-x><C-o>')
+    wait('completion items', function()
+      return eval("return #vim.fn.complete_info({ 'items' }).items") > 0
+    end)
+    vim.rpcrequest(chan, 'nvim_input', '<C-y>')
+    local want = enabled and 'Array.filter(' or 'xs | filter'
+    vim.wait(2000, function()
+      return eval('return vim.api.nvim_get_current_line()'):find(want, 1, true) ~= nil
+    end, 20)
+    return eval('return vim.api.nvim_get_current_line()')
+  end)
+  vim.fn.jobstop(chan)
+  assert(ok, res)
+  return res
+end
+h.eq('  var ys = xs | Array.filter()', complete(true), 'completion expands a snippet')
+h.eq('  var ys = xs | filter', complete(false), 'completion = false leaves the omnifunc alone')
