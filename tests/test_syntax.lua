@@ -99,6 +99,20 @@ h.eq('antRegex', h.group(25, '/{/'), 'regex at the start of a continuation line'
 h.eq('antString', h.group(25, '""'), 'string after a regex on a continuation line')
 h.eq('antOperator', h.group(27, '/ count'), 'division at the start of a continuation line')
 
+-- A start tag over several lines holds attributes on each of them.
+h.buffer({
+  'var page = <div',
+  '  class="a" id={id}',
+  '>',
+  '  if x',
+  '</div>',
+})
+h.eq('antAttribute', h.group(2, 'class'), 'attribute on a continuation line')
+h.eq('antAttributeString', h.group(2, '"a"'), 'attribute string on a continuation line')
+h.eq('antAttribute', h.group(2, 'id'), 'second attribute on a continuation line')
+h.eq('antTag', h.group(3, '>'), 'end of a start tag on its own line')
+h.eq('antElement', h.group(4, 'if'), 'content after a start tag over several lines')
+
 -- A keyword before ( stays a keyword; a name before ( is a call.
 h.buffer({
   'if (a) { while (b) { for (x in xs) { go (f)() } } }',

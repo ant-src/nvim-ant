@@ -129,6 +129,14 @@ local function inside_text(lnum)
   return in_kept(lnum, math.max(first, 1)) and in_kept(lnum - 1, #vim.fn.getline(lnum - 1) + 1)
 end
 
+-- starts_tag_end tells whether a line starts with the > that ends a start tag begun on a line above.
+local function starts_tag_end(lnum)
+  local line = vim.fn.getline(lnum)
+  local first = vim.fn.match(line, '\\S') + 1
+  return first > 0 and line:sub(first, first) == '>' and vim.b.current_syntax == 'ant'
+    and vim.fn.synIDattr(vim.fn.synID(lnum, first, 0), 'name') == 'antTag'
+end
+
 local function prev(lnum)
   return vim.fn.prevnonblank(lnum - 1)
 end
@@ -214,8 +222,9 @@ function M.get(lnum)
   local sw = vim.fn.shiftwidth()
   local cur = vim.trim(vim.fn.getline(lnum))
 
-  -- a line that starts with a closer lines up with the line that opened it
-  if cur:match('^[%)%]}]') or cur:match('^</') or cur:match('^/>') then
+  -- a line that starts with a closer lines up with the line that opened it, and so does one that
+  -- starts with the > that ends a start tag, with the line of its < (fmt.md 4.10)
+  if cur:match('^[%)%]}]') or cur:match('^</') or cur:match('^/>') or starts_tag_end(lnum) then
     local k = opener(lnum, 1)
     if k > 0 then
       return info(k).closes > 0 and vim.fn.indent(start(k)) or vim.fn.indent(k)
@@ -223,6 +232,10 @@ function M.get(lnum)
   end
 
   local pi = info(p)
+  -- the content after a line that is the > ending a start tag is one level deeper than it
+  if pi.opens == 0 and pi.closes == 0 and starts_tag_end(p) then
+    return vim.fn.indent(p) + sw
+  end
   if pi.opens > 0 then
     local base = pi.closes > 0 and start(p) or p
     return vim.fn.indent(base) + sw

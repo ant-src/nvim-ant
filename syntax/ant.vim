@@ -99,8 +99,8 @@ syn region antElementNested matchgroup=antTag start=+<>+ end=+</>+ contained con
 " <script> and <style> hold literal text.
 syn region antRaw matchgroup=antTag start=+\c<\z(script\|style\)\%(\_s\|/\|>\)\@=+ end=+</\z1\_s*>+ end=+/>+ contained contains=antStartTag
 execute 'syn region antRaw matchgroup=antTag start=+' . s:markup . '\c<\z(script\|style\)\%(\_s\|/\|>\)\@=+ end=+</\z1\_s*>+ end=+/>+ contains=antStartTag'
-" The start tag runs from the name to > or up to />.
-syn region antStartTag start=+\%(<\a[-[:alnum:]]*\)\@<=+ matchgroup=antTag end=+>+ end=+\ze/>+ contained contains=antAttribute,antAttributeString,antMarkupInterpolation
+" The start tag runs from the name to > or up to />, over as many lines as its attributes take.
+syn region antStartTag start=+\%(<\a[-[:alnum:]]*\_s*\)\@<=\S\@=+ matchgroup=antTag end=+>+ end=+\ze/>+ contained contains=antAttribute,antAttributeString,antMarkupInterpolation
 syn match antAttribute '\<\h[-[:alnum:]_:.]*' contained
 syn region antAttributeString start=+"+ end=+"+ contained contains=antEntity
 syn region antMarkupInterpolation matchgroup=antDelimiter start='{' end='}' contained contains=TOP

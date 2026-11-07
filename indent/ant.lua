@@ -5,10 +5,11 @@ end
 vim.b.did_indent = 1
 
 vim.bo.indentexpr = "v:lua.require'ant.indent'.get(v:lnum)"
--- <<> is a typed <: a bare < would start a key name and swallow the keys after it. =</ reindents
--- an end tag once its / is typed, when it can be told from a start tag; =... and =|| a spread and
--- an operator once they can be told from a continuation.
-vim.bo.indentkeys = '0{,0},0),0],0<<>,0=</,!^F,o,O,e,0.,0=...,0|,0=||'
+-- <<> is a typed <: a bare < would start a key name and swallow the keys after it; <>> is a typed
+-- >, which may end a start tag begun above. =</ reindents an end tag once its / is typed, when it
+-- can be told from a start tag; =... and =|| a spread and an operator once they can be told from a
+-- continuation.
+vim.bo.indentkeys = '0{,0},0),0],0<<>,0<>>,0=</,!^F,o,O,e,0.,0=...,0|,0=||'
 vim.bo.autoindent = true
 vim.bo.smartindent = false
 vim.bo.cindent = false

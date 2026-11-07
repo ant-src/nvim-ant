@@ -63,6 +63,31 @@ reindent({
 }, 'markup')
 
 reindent({
+  'func f(): Html {',
+  '  <div',
+  '    class="a"',
+  '    id={id}',
+  '  >',
+  '    text',
+  '    <ul>',
+  '      <li',
+  '        class="b"',
+  '      >',
+  '        <img',
+  '          src="x.png"',
+  '        />',
+  '        <span>y</span>',
+  '      </li>',
+  '    </ul>',
+  '    <p',
+  '      class="c"',
+  '    ></p>',
+  '  </div>',
+  '}',
+  'var n = 1',
+}, 'start tags over several lines')
+
+reindent({
   'if x {',
   '  /* a block',
   '     comment */',
@@ -103,6 +128,15 @@ typed({ 'ivar page = <div><CR><p>hi</p><CR></div><Esc>' }, {
   '  <p>hi</p>',
   '</div>',
 }, 'typing markup')
+
+typed({ 'ivar page = <div<CR>class="a"<CR>><CR>hi<CR></div><CR>var n = 1<Esc>' }, {
+  'var page = <div',
+  '  class="a"',
+  '>',
+  '  hi',
+  '</div>',
+  'var n = 1',
+}, 'typing a start tag over several lines')
 
 typed({ 'ivar p = point<CR>.x<CR>var n = xs<CR>| Array.first()<Esc>' }, {
   'var p = point',
