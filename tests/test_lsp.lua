@@ -100,9 +100,9 @@ wait('the new client on the prelude', function()
 end)
 
 -- Completion: accepting an item from the omnifunc expands its snippet, so xs | filt becomes
--- xs | Array.filter() with the cursor between the parentheses. Without the completion option no
--- snippet expands, and what the omnifunc inserts is up to Neovim: 0.11 inserts the filter text,
--- 0.12 the item's plain insert text, Array.filter() with the cursor after it.
+-- xs | Array.filter() with the cursor between the parentheses. Without the completion option what
+-- the omnifunc inserts is up to Neovim: 0.11 inserts the filter text, filter, and 0.12 expands the
+-- snippet itself, so the test checks only that an item is accepted.
 -- Insert mode is driven in a child Neovim, whose input does not block this one.
 local function complete(enabled)
   local cfile = vim.fs.joinpath(vim.fn.tempname(), 'complete.ant')
@@ -138,5 +138,4 @@ local function complete(enabled)
 end
 h.eq('  var ys = xs | Array.filter(', complete(true), 'completion expands a snippet')
 local plain = complete(false)
-assert(plain == '  var ys = xs | filter' or plain == '  var ys = xs | Array.filter()',
-  'completion = false leaves the omnifunc alone: got ' .. vim.inspect(plain))
+assert(plain:find('^  var ys = xs | [%w.]*filter'), 'completion = false leaves the omnifunc alone: got ' .. vim.inspect(plain))
