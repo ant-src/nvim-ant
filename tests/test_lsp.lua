@@ -100,7 +100,9 @@ wait('the new client on the prelude', function()
 end)
 
 -- Completion: accepting an item from the omnifunc expands its snippet, so xs | filt becomes
--- xs | Array.filter(), and without the completion option inserts the item's filter text alone.
+-- xs | Array.filter() with the cursor between the parentheses. Without the completion option no
+-- snippet expands, and what the omnifunc inserts is up to Neovim: 0.11 inserts the filter text,
+-- 0.12 the item's plain insert text, Array.filter() with the cursor after it.
 -- Insert mode is driven in a child Neovim, whose input does not block this one.
 local function complete(enabled)
   local cfile = vim.fs.joinpath(vim.fn.tempname(), 'complete.ant')
@@ -124,15 +126,17 @@ local function complete(enabled)
       return eval("return #vim.fn.complete_info({ 'items' }).items") > 0
     end)
     vim.rpcrequest(chan, 'nvim_input', '<C-y>')
-    local want = enabled and 'Array.filter(' or 'xs | filter'
     vim.wait(2000, function()
-      return eval('return vim.api.nvim_get_current_line()'):find(want, 1, true) ~= nil
+      return eval('return vim.api.nvim_get_current_line()'):find(enabled and 'Array.filter(' or 'filter', 1, true) ~= nil
     end, 20)
-    return eval('return vim.api.nvim_get_current_line()')
+    -- The text before the cursor, which ends inside the parentheses only for a snippet.
+    return eval('local col = vim.api.nvim_win_get_cursor(0)[2] return vim.api.nvim_get_current_line():sub(1, col)')
   end)
   vim.fn.jobstop(chan)
   assert(ok, res)
   return res
 end
-h.eq('  var ys = xs | Array.filter()', complete(true), 'completion expands a snippet')
-h.eq('  var ys = xs | filter', complete(false), 'completion = false leaves the omnifunc alone')
+h.eq('  var ys = xs | Array.filter(', complete(true), 'completion expands a snippet')
+local plain = complete(false)
+assert(plain == '  var ys = xs | filter' or plain == '  var ys = xs | Array.filter()',
+  'completion = false leaves the omnifunc alone: got ' .. vim.inspect(plain))

@@ -92,8 +92,9 @@ definition work as in any file.
 
 Completion is enabled with |vim.lsp.completion.enable()|, without
 autotrigger, so that accepting an item from |i_CTRL-X_CTRL-O| with CTRL-Y
-expands its snippet: `xs | filt` becomes `xs | Array.filter()`. Set
-`completion = false` to leave completion to another plugin.
+expands its snippet: `xs | filt` becomes `xs | Array.filter()` with the
+cursor between the parentheses. Set `completion = false` to leave completion
+to another plugin.
 
 Markup elements and attributes are highlighted through the groups
 `@lsp.type.element.ant` and `@lsp.type.attribute.ant`, linked to `@tag` and
