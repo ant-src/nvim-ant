@@ -69,6 +69,8 @@ syn match antNumber '\<0b[01]\%(_\?[01]\)*\>'
 syn match antNumber '\<\d\%(_\?\d\)*\>'
 syn match antFloat '\<\d\%(_\?\d\)*\.\d\%(_\?\d\)*\%(e[-+]\?\d\%(_\?\d\)*\)\?\>'
 syn match antFloat '\<\d\%(_\?\d\)*e[-+]\?\d\%(_\?\d\)*\>'
+" A duration literal: numbers each followed by a unit, as 2h30m or 1.5s.
+syn match antDuration '\<\%(\d\%(_\?\d\)*\%(\.\d\%(_\?\d\)*\)\?\%(ms\|us\|ns\|h\|m\|s\)\)\+\>'
 
 syn match antOperator '[-+*/%=!<>&|?]'
 syn match antOperator '\.\.\.'
@@ -132,6 +134,7 @@ hi def link antFuncName Function
 hi def link antBuiltin Special
 hi def link antNumber Number
 hi def link antFloat Float
+hi def link antDuration Number
 hi def link antOperator Operator
 hi def link antString String
 hi def link antRawString String

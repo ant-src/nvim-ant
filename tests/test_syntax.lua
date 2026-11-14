@@ -28,6 +28,7 @@ h.buffer({
   '  /{/, "")',
   'var avg = (total',
   '  / count)',
+  'Time.sleep(500ms, 1h30.5m, 90m.x)',
 })
 vim.bo.filetype = 'ant'
 
@@ -73,6 +74,9 @@ h.eq('antNumber', h.group(14, '0o17'), 'octal')
 h.eq('antNumber', h.group(14, '1_000'), 'separated digits')
 h.eq('antFloat', h.group(14, '2.5e-3'), 'float')
 h.eq('antFloat', h.group(14, '1e9'), 'exponent')
+h.eq('antDuration', h.group(28, '500ms'), 'duration')
+h.eq('antDuration', h.group(28, '1h30.5m'), 'duration with a fraction')
+h.eq('antDuration', h.group(28, '90m'), 'duration before a member')
 h.eq('antBuiltin', h.group(14, 'println'), 'prelude function')
 h.eq('antConstant', h.group(14, 'null'), 'null')
 h.eq('antConditional', h.group(14, 'else'), 'else')
